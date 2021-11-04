@@ -1,0 +1,14 @@
+{
+  "name": "combatbot",
+  "version": "1.0.0",
+  "description": "D&D combat utilities Discord bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "T S Vallender",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^13.3.1"
+  }
+}
