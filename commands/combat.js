@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+const { getUser } = require('../index.js');
 
 const row = new MessageActionRow();
 
@@ -16,23 +17,40 @@ module.exports = {
 	.setDescription('Starts a combat')
 	.addSubcommand(subcommand =>
 	    subcommand
+		.setName('print')
+		.setDescription('Prints combat'))
+	.addSubcommand(subcommand =>
+	    subcommand
 		.setName('zone')
 		.setDescription('Add zones to the combat')
-		.addStringOption(option => option.setName('zones').setDescription('Zone names')))
+		.addStringOption(option =>
+		    option.setName('zones').setDescription('Zone names').setRequired(true)))
 	.addSubcommand(subcommand =>
 	    subcommand
 		.setName('party')
-		.setDescription('Add party to combat')),
+		.setDescription('Add party to combat'))
+	.addSubcommand(subcommand =>
+	    subcommand
+		.setName('title')
+		.setDescription('Set combat name')
+		.addStringOption(option =>
+		    option.setName('title').setDescription('Combat title').setRequired(true))),
     async execute(interaction) {
 	switch(interaction.options.getSubcommand()) {
+	case "print":
+	    printCombat(interaction);
+	    await interaction.reply({embeds: [embed], components: [row]});
+	    break;
 	case "zone":
-	    const zones = interaction.options.getString("zones");
-	    if (zones) {
-		await addZones(zones, interaction);
-	    }
+	    const z = interaction.options.getString("zones");
+	    await addZones(z, interaction);
 	    break;
 	case "party":
 	    await interaction.reply("Adding party to combat");
+	    break;
+	case "title":
+	    embed.setTitle(interaction.options.getString("title"));
+	    await interaction.reply({content: 'Title set to ' + embed.title, ephemeral: true});
 	    break;
 	}
     },
@@ -56,7 +74,7 @@ function addZones(newZones, interaction) {
     zones.forEach(function c(value, index) {
 	row.addComponents(
 	    new MessageButton()
-		.setCustomId('zone-' + index)
+		.setCustomId(index.toString())
 		.setLabel(value)
 		.setStyle('PRIMARY'),
 	);
@@ -65,6 +83,28 @@ function addZones(newZones, interaction) {
     interaction.reply({embeds: [embed], components: [row]});
 }
 
-function addPlayer(player, zone) {
-    console.log(player + " in " + zone);
+function addPlayer(interaction, zone) {
+    interaction.guild.members.fetch(interaction.user.id).then(member => {
+	locations[member['nickname']] = interaction.customId;
+    });
 }
+
+async function printCombat(interaction) {
+    let title = embed.title;
+    embed = new MessageEmbed();
+    embed.setTitle(title);
+    zones.forEach(function c(value, index) {
+	let characters = '';
+	for (const key in locations) {
+	    if(parseInt(locations[key]) === index) {
+		characters += key + ', ';
+	    }
+	}
+	if (characters) {
+	    embed.addField(value, characters);
+	} else {
+	    embed.addField(value, 'No characters here');
+	}
+    });
+}
+
