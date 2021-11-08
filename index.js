@@ -2,8 +2,6 @@ const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
 const { token } = require('./config.json');
 
-module.exports = {getUser}
-
 // Create a new client instance
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
@@ -31,6 +29,7 @@ client.on('interactionCreate', async interaction => {
     //console.log(interaction);
     if (interaction.isButton()) {
 	combat.addPlayer(interaction);
+	await interaction.reply({ content: 'You moved', ephemeral: true});
     }
 
     const command = client.commands.get(interaction.commandName);
@@ -49,6 +48,3 @@ client.on('interactionCreate', async interaction => {
 // Login to Discord with your client's token
 client.login(token);
 
-async function getUser(id) {
-    return client.members.fetch(id);
-}

@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
-const { getUser } = require('../index.js');
 
 const row = new MessageActionRow();
 
@@ -34,7 +33,13 @@ module.exports = {
 		.setName('title')
 		.setDescription('Set combat name')
 		.addStringOption(option =>
-		    option.setName('title').setDescription('Combat title').setRequired(true))),
+		    option.setName('title').setDescription('Combat title').setRequired(true)))
+	.addSubcommand(subcommand =>
+	    subcommand
+		.setName('move')
+		.setDescription('Move a player or creature')
+		.addStringOption(option =>
+		    option.setName('move').setDescription('Creature and zone number').setRequired(true))),
     async execute(interaction) {
 	switch(interaction.options.getSubcommand()) {
 	case "print":
@@ -44,13 +49,20 @@ module.exports = {
 	case "zone":
 	    const z = interaction.options.getString("zones");
 	    await addZones(z, interaction);
+	    await interaction.reply({content: 'Zones added', ephemeral: true});
 	    break;
 	case "party":
-	    await interaction.reply("Adding party to combat");
+	    // TODO add all party to given zone, update print
+	    await interaction.reply({content: 'Zones added', ephemeral: true});
 	    break;
 	case "title":
 	    embed.setTitle(interaction.options.getString("title"));
 	    await interaction.reply({content: 'Title set to ' + embed.title, ephemeral: true});
+	    break;
+	case "move":
+	    const m = interaction.options.getString("move");
+	    await interaction.reply({content: "Moving", ephemeral: true});
+	    move(m); // TODO update print
 	    break;
 	}
     },
@@ -79,8 +91,6 @@ function addZones(newZones, interaction) {
 		.setStyle('PRIMARY'),
 	);
     });
-    
-    interaction.reply({embeds: [embed], components: [row]});
 }
 
 function addPlayer(interaction, zone) {
@@ -108,3 +118,24 @@ async function printCombat(interaction) {
     });
 }
 
+function move(m) {
+    var myRegexp = /[^\s"]+|"([^"]*)"/gi;
+    let input = [];
+    do {
+	//Each call to exec returns the next regex match as an array
+	var match = myRegexp.exec(m);
+	if (match != null)
+	{
+            //Index 1 in the array is the captured group if it exists
+            //Index 0 is the matched text, which we use if no captured group exists
+            input.push(match[1] ? match[1] : match[0]);
+	}
+    } while (match != null);
+
+    for(let i = 0; i < input.length; i++) {
+	let creature = input[i];
+	let zone = input[++i];
+
+	locations[creature] = zone;
+    }
+}
