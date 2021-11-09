@@ -4,9 +4,8 @@ const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
 const row = new MessageActionRow();
 
 let embed = new MessageEmbed()
-    .setColor('#0099ff')
     .setTitle('Combat!')
-
+let lastMessage = null;
 let zones = [];
 let locations = {}; // dictionary of username -> zones index
 
@@ -39,30 +38,54 @@ module.exports = {
 		.setName('move')
 		.setDescription('Move a player or creature')
 		.addStringOption(option =>
-		    option.setName('move').setDescription('Creature and zone number').setRequired(true))),
+		    option.setName('move').setDescription('Creature and zone number').setRequired(true)))
+	.addSubcommand(subcommand =>
+	    subcommand
+		.setName('remove')
+		.setDescription('Remove combatant')
+		.addStringOption(option =>
+		    option.setName('combatant').setDescription('Combatant to remove').setRequired(true))),
     async execute(interaction) {
 	switch(interaction.options.getSubcommand()) {
 	case "print":
-	    printCombat(interaction);
-	    await interaction.reply({embeds: [embed], components: [row]});
+	    printCombat();
+	    if (lastMessage == null) {
+		await interaction.reply({embeds: [embed], components: [row]})
+		lastMessage = await interaction.fetchReply();
+	    } else {
+		lastMessage.edit({embeds: [embed]});
+		await interaction.reply("Combat updated");
+		await interaction.deleteReply();
+	    }
+	    
 	    break;
 	case "zone":
 	    const z = interaction.options.getString("zones");
 	    await addZones(z, interaction);
-	    await interaction.reply({content: 'Zones added', ephemeral: true});
+	    await interaction.reply('Zones added');
+	    await interaction.deleteReply();
 	    break;
 	case "party":
 	    // TODO add all party to given zone, update print
-	    await interaction.reply({content: 'Zones added', ephemeral: true});
+	    await interaction.reply('Zones added');
+	    await interaction.deleteReply();
 	    break;
 	case "title":
 	    embed.setTitle(interaction.options.getString("title"));
-	    await interaction.reply({content: 'Title set to ' + embed.title, ephemeral: true});
+	    await interaction.reply('Title set to ' + embed.title);
+	    await interaction.deleteReply();
 	    break;
 	case "move":
 	    const m = interaction.options.getString("move");
-	    await interaction.reply({content: "Moving", ephemeral: true});
 	    move(m); // TODO update print
+	    await interaction.reply("Moving");
+	    await interaction.deleteReply();
+	    break;
+	case "remove":
+	    const r = interaction.options.getString("combatant");
+	    remove(r);
+	    await interaction.reply("Removing");
+	    await interaction.deleteReply();
 	    break;
 	}
     },
@@ -93,16 +116,22 @@ function addZones(newZones, interaction) {
     });
 }
 
-function addPlayer(interaction, zone) {
-    interaction.guild.members.fetch(interaction.user.id).then(member => {
+async function addPlayer(interaction, zone) {
+    await interaction.guild.members.fetch(interaction.user.id).then(member => {
 	locations[member['nickname']] = interaction.customId;
     });
+    printCombat();
+    lastMessage.edit({embeds: [embed]});
 }
 
-async function printCombat(interaction) {
+async function printCombat() {
     let title = embed.title;
+
     embed = new MessageEmbed();
-    embed.setTitle(title);
+    embed
+	.setTitle(title)
+        .setColor('#0099ff');
+
     zones.forEach(function c(value, index) {
 	let characters = '';
 	for (const key in locations) {
@@ -138,4 +167,13 @@ function move(m) {
 
 	locations[creature] = zone;
     }
+    printCombat();
+    lastMessage.edit({embeds: [embed]});
 }
+	
+function remove(r) {
+    delete locations[r];
+    printCombat()
+    lastMessage.edit({embeds: [embed]});
+}
+

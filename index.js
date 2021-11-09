@@ -29,7 +29,8 @@ client.on('interactionCreate', async interaction => {
     //console.log(interaction);
     if (interaction.isButton()) {
 	combat.addPlayer(interaction);
-	await interaction.reply({ content: 'You moved', ephemeral: true});
+	await interaction.reply('You moved');
+	await interaction.deleteReply();
     }
 
     const command = client.commands.get(interaction.commandName);
@@ -40,7 +41,6 @@ client.on('interactionCreate', async interaction => {
 	await command.execute(interaction);
     } catch (error) {
 	console.error(error);
-	await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
     }
 });
 
