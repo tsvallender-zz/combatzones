@@ -24,7 +24,10 @@ client.once('ready', () => {
 });
 
 client.on('interactionCreate', async interaction => {
-    if (!interaction.isCommand() && !interaction.isButton()) return;
+    if (!interaction.isCommand() && !interaction.isButton()) {
+	console.log('ono');
+	return;
+    }
 
     //console.log(interaction);
     if (interaction.isButton()) {
