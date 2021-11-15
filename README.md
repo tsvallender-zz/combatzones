@@ -2,7 +2,9 @@
 
 Combat Zones is a Discord bot for running zone-based combat in D&D,
 and is inspired by [Sly Flourish's article on the
-subject](https://slyflourish.com/fate_style_zones_in_5e.html).
+subject](https://slyflourish.com/fate_style_zones_in_5e.html) and [his
+more-specific article on running them in a text-based
+fashion](https://slyflourish.com/text-based_battle_maps.html).
 
 ## Status
 
