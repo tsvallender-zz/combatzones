@@ -103,10 +103,11 @@ async function printCombat() {
 		characters += key;
 	    }
 	}
+	let title = '__' + (index + 1).toString() + ': ' + value + '__';
 	if (characters) {
-	    embed.addField(value, characters);
+	    embed.addField(title, characters);
 	} else {
-	    embed.addField(value, 'No characters here');
+	    embed.addField(title, 'No combatants');
 	}
     });
 }
@@ -127,7 +128,7 @@ function move(m) {
 
     for(let i = 0; i < input.length; i++) {
 	let creature = input[i];
-	let zone = input[++i];
+	let zone = input[++i] - 1;
 
 	locations[creature] = zone;
     }
@@ -135,7 +136,5 @@ function move(m) {
 	
 function remove(r) {
     delete locations[r];
-    printCombat()
-    lastMessage.edit({embeds: [embed]});
 }
 
