@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
 
-const row = new MessageActionRow();
+let row = new MessageActionRow();
 
 let embed = new MessageEmbed()
     .setTitle('Combat!')
@@ -16,7 +16,7 @@ module.exports = {
 	.addStringOption(option =>
 	    option.setName('zones').setDescription('Zone names to add'))
 	.addStringOption(option =>
-	    option.setName('title').setDescription('Combat title'))
+	    option.setName('new').setDescription('Combat title'))
 	.addStringOption(option =>
 	    option.setName('move').setDescription('Creature and zone number'))
 	.addStringOption(option =>
@@ -24,13 +24,13 @@ module.exports = {
 	.addStringOption(option =>
 	    option.setName('rename').setDescription('Rename a combatant')),
     async execute(interaction) {
+	const t = interaction.options.getString("new");
+	if (t) {
+	    await newCombat(t);
+	}
 	const z = interaction.options.getString("zones");
 	if (z) {
 	    await addZones(z, interaction);
-	}
-	const t = interaction.options.getString("title");
-	if (t) {
-	    embed.setTitle(t);
 	}
 	const m = interaction.options.getString("move");
 	if (m) {
@@ -47,16 +47,32 @@ module.exports = {
 
 	printCombat();
 	if (lastMessage == null) {
-	    await interaction.reply({embeds: [embed], components: [row]})
+	    if (row.components.length > 0) {
+		await interaction.reply({embeds: [embed], components: [row]});
+	    } else {
+		await interaction.reply({embeds: [embed]});
+	    }
 	    lastMessage = await interaction.fetchReply();
 	} else {
-	    lastMessage.edit({embeds: [embed], components: [row]});
+	    if (row.components.length > 0) {
+		lastMessage.edit({embeds: [embed], components: [row]});
+	    } else {
+		lastMessage.edit({embeds: [embed]});
+	    }
 	    await interaction.reply("Combat updated");
 	    await interaction.deleteReply();
 	}
     },
     addPlayer
 };
+
+function newCombat(t) {
+    lastMessage = null;
+    embed.setTitle(t);
+    zones = [];
+    locations = {};
+    row = new MessageActionRow();
+}
 
 function addZones(newZones, interaction) {
     var myRegexp = /[^\s"]+|"([^"]*)"/gi;
