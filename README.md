@@ -13,6 +13,9 @@ server](https://discord.com/api/oauth2/authorize?client_id=905073567148965949&pe
 
 Combat Zones is in alpha and has known bugs. Development is ongoing.
 
+Current primary known issue is the maximum number of zones is 5 due to
+Discord button limitations. Working on this!
+
 ## Usage
 
 The bot responds to the `/combat` command. After the initial
@@ -21,21 +24,21 @@ initial message.
 
 ## Options
 
-__**Set a title**__
+### Set a title
 
 `new:` Start a new combat with the given title. **Specifying this
 option begins a new combat and will delete existing combat details**.
 
 e.g. `/combat new: Battle for Helm's Hold`
 
-__**Add zones to a combat**__
+### Add zones to a combat
 
 `zones:` Followed by a list of zone names. Zone names including spaces
 should be wrapped in double quotes.
 
 e.g. `/combat zones: Balcony "Crumbling staircase" Laboratory`
 
-__**Add or move combatants**__
+### Add or move combatants
 
 `move:` Combatant name, followed by the index of the zone they are
 moving to. Names including spaces should be wrapped in double
@@ -44,16 +47,22 @@ button.
 
 e.g. `/combat move: "Scarred orc" 2 "Rust monster" 1 Bruenor 1`
 
-__**Remove combatant**__
+### Remove combatant
 
 `remove:`
 
 e.g. `/combat remove: "Scarred orc"`
 
 
-__**Rename combatants**__
+### Rename combatants
 
 `rename:` Old name, then new name. Names including spaces should be
 wrapped in double quotes.
 
 e.g. `/combat rename: "Rust monster" "Limping rust monster"`
+
+### Multiple options
+
+You can combine options as you see fit, for example:
+
+`/combat new: Battle for Skull Pass zones: Laboratory Stairwell "Collapsing balcony" move: Orc 1 Bugbear 2`
