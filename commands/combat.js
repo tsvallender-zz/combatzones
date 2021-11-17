@@ -14,13 +14,15 @@ module.exports = {
 	.setName('combat')
 	.setDescription('Starts a combat')
 	.addStringOption(option =>
-	    option.setName('zones').setDescription('Zone names'))
+	    option.setName('zones').setDescription('Zone names to add'))
 	.addStringOption(option =>
 	    option.setName('title').setDescription('Combat title'))
 	.addStringOption(option =>
 	    option.setName('move').setDescription('Creature and zone number'))
 	.addStringOption(option =>
-	    option.setName('remove').setDescription('Remove combatant')),
+	    option.setName('remove').setDescription('Remove combatant'))
+	.addStringOption(option =>
+	    option.setName('rename').setDescription('Rename a combatant')),
     async execute(interaction) {
 	const z = interaction.options.getString("zones");
 	if (z) {
@@ -37,6 +39,10 @@ module.exports = {
 	const r = interaction.options.getString("remove");
 	if (r) {
 	    remove(r);
+	}
+	const re = interaction.options.getString("rename");
+	if (re) {
+	    rename(re);
 	}
 
 	printCombat();
@@ -139,3 +145,23 @@ function remove(r) {
     delete locations[r];
 }
 
+function rename(re) {
+    var myRegexp = /[^\s"]+|"([^"]*)"/gi;
+    let names = [];
+    do {
+	var match = myRegexp.exec(re);
+
+	if (match != null) {
+	    names.push(match[1] ? match[1] : match[0]);
+	}
+    } while (match != null);
+
+    for (let i = 0; i < names.length; i++) {
+	let oldName = names[i];
+	let newName = names[++i];
+	
+	console.log("old: " + oldName + " new: " + newName);
+	locations[newName] = locations[oldName];
+	delete locations[oldName];
+    }
+}
