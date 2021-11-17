@@ -18,12 +18,37 @@ initial message.
 
 ## Options
 
+__*Add zones to a combat*__
+
 `zones:` Followed by a list of zone names. Zone names including spaces
 should be wrapped in double quotes.
 
+e.g. `/combat zones: Balcony "Crumbling staircase" Laboratory`
+
+__*Add or move combatants*__
+
 `move:` Combatant name, followed by the index of the zone they are
-moving to. Names including spaces should be wrapped in double quotes.
+moving to. Names including spaces should be wrapped in double
+quotes. Players can add or move themselves by clicking the zone name
+button.
 
-`remove:` Remove the given combatant.
+e.g. `/combat move: "Scarred orc" 2 "Rust monster" 1 Bruenor 1`
 
-`title:` Set the title of the combat.
+__*Remove combatant*__
+
+`remove:`
+
+e.g. `/combat remove: "Scarred orc"`
+
+__*Set a title*__
+
+`title:`
+
+e.g. `/combat title: Battle for Helm's Hold`
+
+__*Rename combatants*__
+
+`rename:` Old name, then new name. Names including spaces should be
+wrapped in double quotes.
+
+e.g. `/combat rename: "Rust monster" "Limping rust monster"`
