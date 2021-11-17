@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
 
-let row = new MessageActionRow();
+let buttons = [];
 
 let embed = new MessageEmbed()
     .setTitle('Combat!')
@@ -31,6 +31,7 @@ module.exports = {
 	const z = interaction.options.getString("zones");
 	if (z) {
 	    await addZones(z, interaction);
+	    await buildButtonRows();
 	}
 	const m = interaction.options.getString("move");
 	if (m) {
@@ -47,18 +48,10 @@ module.exports = {
 
 	printCombat();
 	if (lastMessage == null) {
-	    if (row.components.length > 0) {
-		await interaction.reply({embeds: [embed], components: [row]});
-	    } else {
-		await interaction.reply({embeds: [embed]});
-	    }
+	    await interaction.reply({embeds: [embed], components: buttons});
 	    lastMessage = await interaction.fetchReply();
 	} else {
-	    if (row.components.length > 0) {
-		lastMessage.edit({embeds: [embed], components: [row]});
-	    } else {
-		lastMessage.edit({embeds: [embed]});
-	    }
+	    lastMessage.edit({embeds: [embed], components: buttons});
 	    await interaction.reply("Combat updated");
 	    await interaction.deleteReply();
 	}
@@ -71,7 +64,7 @@ function newCombat(t) {
     embed.setTitle(t);
     zones = [];
     locations = {};
-    row = new MessageActionRow();
+    buttons = [];
 }
 
 function addZones(newZones, interaction) {
@@ -88,15 +81,7 @@ function addZones(newZones, interaction) {
             zones.push(match[1] ? match[1] : match[0]);
 	}
     } while (match != null);
-
-    for (let i = end; i < zones.length; i++) {
-	row.addComponents(
-	    new MessageButton()
-		.setCustomId(i.toString())
-		.setLabel(zones[i])
-		.setStyle('PRIMARY'),
-	);
-    }
+    buildButtonRows();
 }
 
 async function addPlayer(interaction, zone) {
@@ -179,5 +164,23 @@ function rename(re) {
 	console.log("old: " + oldName + " new: " + newName);
 	locations[newName] = locations[oldName];
 	delete locations[oldName];
+    }
+}
+
+function buildButtonRows() {
+    let buttonRow = 0;
+    buttons[buttonRow] = new MessageActionRow();
+    for (let z = 0; z < zones.length; z++) {
+	buttons[buttonRow].addComponents(
+	    new MessageButton()
+		.setCustomId(z.toString())
+		.setLabel(zones[z])
+		.setStyle('PRIMARY'),
+	);
+	if ( (z+1) % 5 == 0) {
+	    buttonRow++;
+	    buttons[buttonRow] = new MessageActionRow();
+	}
+
     }
 }

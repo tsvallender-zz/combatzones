@@ -11,10 +11,8 @@ server](https://discord.com/api/oauth2/authorize?client_id=905073567148965949&pe
 
 ## Status
 
-Combat Zones is in alpha and has known bugs. Development is ongoing.
-
-Current primary known issue is the maximum number of zones is 5 due to
-Discord button limitations. Working on this!
+Combat Zones is in alpha. New features are incoming and feedback is
+greatly appreciated!
 
 ## Usage
 
