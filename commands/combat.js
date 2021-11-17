@@ -44,7 +44,7 @@ module.exports = {
 	    await interaction.reply({embeds: [embed], components: [row]})
 	    lastMessage = await interaction.fetchReply();
 	} else {
-	    lastMessage.edit({embeds: [embed]});
+	    lastMessage.edit({embeds: [embed], components: [row]});
 	    await interaction.reply("Combat updated");
 	    await interaction.deleteReply();
 	}
@@ -54,7 +54,8 @@ module.exports = {
 
 function addZones(newZones, interaction) {
     var myRegexp = /[^\s"]+|"([^"]*)"/gi;
-     
+    let end = zones.length;
+    
     do {
 	//Each call to exec returns the next regex match as an array
 	var match = myRegexp.exec(newZones);
@@ -66,14 +67,14 @@ function addZones(newZones, interaction) {
 	}
     } while (match != null);
 
-    zones.forEach(function c(value, index) {
+    for (let i = end; i < zones.length; i++) {
 	row.addComponents(
 	    new MessageButton()
-		.setCustomId(index.toString())
-		.setLabel(value)
+		.setCustomId(i.toString())
+		.setLabel(zones[i])
 		.setStyle('PRIMARY'),
 	);
-    });
+    }
 }
 
 async function addPlayer(interaction, zone) {
